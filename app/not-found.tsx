@@ -1,4 +1,23 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "404 Page",
+  description: "Page you are looking for does not exist",
+  openGraph: {
+    title: "404 Page",
+    description:"Page you are looking for does not exist",
+     images: [
+        {
+          url: 'https://ac.goit.global/fullstack/react/og-meta.jpg',
+          width: 1200,
+          height: 630,
+          alt: "notehub",
+        },
+      ],
+      type: "article",
+  }
+}
 
 const NotFound = () => {
   return (
