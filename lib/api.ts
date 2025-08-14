@@ -31,6 +31,12 @@ interface RawFetchNotesResponse {
   totalPages: number;
 }
 
+export type NewNoteData = {
+  title: string;
+  content: string;
+  tag: string;
+};
+
 
 export const fetchNotes = async ({page = 1, perPage = 12, search = '', tag}: FetchNotesParams): Promise<FetchNotesResponse> => {
     const response = await axios.get<RawFetchNotesResponse>('/notes', {
@@ -58,18 +64,9 @@ export const fetchNoteById = async (id: string): Promise<Note> => {
     return response.data;
 };
 
-// export const fetchNoteByTag = async (tag: string): Promise<Note> => {
-//     const response = await axios.get<Note>(`/notes/${tag}`);
-//     console.log(response);
-//     return response.data;
-// }
 
 
-export const createNote = async (note: {
-    title: string;
-    content: string;
-    tag: string;
-}): Promise<Note> => {
+export const createNote = async (note: NewNoteData): Promise<Note> => {
     const response = await axios.post<Note>('/notes', note);
 
     return response.data;

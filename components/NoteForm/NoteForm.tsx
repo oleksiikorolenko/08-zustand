@@ -1,95 +1,92 @@
 'use client'
 
-import { Formik, Form, Field, ErrorMessage} from "formik";
-import * as Yup from "yup";
+
+// import * as Yup from "yup";
 import css from "./NoteForm.module.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createNote } from "@/lib/api";
+import { createNote, NewNoteData } from "@/lib/api";
+import { useRouter } from "next/router";
 
 
-const validationSchema = Yup.object({
-    title: Yup.string().min(3).max(50).required(),
-    content: Yup.string().max(500),
-    tag: Yup.mixed().oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping']).required(),
-});
+
+// const validationSchema = Yup.object({
+//     title: Yup.string().min(3).max(50).required(),
+//     content: Yup.string().max(500),
+//     tag: Yup.mixed().oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping']).required(),
+// });
 
 
-    interface NoteFormProps {
-        onClose: () => void;
-}
+//     interface NoteFormProps {
+//         onClose: () => void;
+// }
 
-export default function NoteForm ({ onClose }: NoteFormProps) {
+export default function NoteForm () {
     const queryClient = useQueryClient();
+    const router = useRouter();
+
+    const handleCancel = () => router.push('/notes/filter/all');
 
      const mutation = useMutation({
          mutationFn: createNote,
          onSuccess: () => {
              queryClient.invalidateQueries({ queryKey: ['notes'] });
-             onClose();
+             handleCancel();
          },
          onError: (error) => {
             console.error('Create note failed:', error);
           },
-            });
+     });
+    
+    const handleSubmit = (formData: FormData) => {
+        const values = Object.fromEntries(formData) as NewNoteData;
+        mutation.mutate(values);
+    }
 
 
     return (
-        <Formik initialValues={{ title: '', content: '', tag: 'Todo' }}
-            validationSchema={validationSchema}
-            onSubmit={(values) => {
-                mutation.mutate(values);
-                }}
-        >
-            {({resetForm}) => (
-                <Form className={css.form}>
+        <form action={handleSubmit} className={css.form}>
+        
                     <div className={css.formGroup}>
                         <label htmlFor="title">Title</label>
-                        <Field type="text" name="title" className={css.input} />
-                        <ErrorMessage name="title" component="span" className={css.error} />
+                        <input type="text" name="title" className={css.input} />
+        
                     </div>
 
                     <div className={css.formGroup}>
                         <label htmlFor="content">Content</label>
-                        <Field
-                            as="textarea"
+                        <textarea
+            
                             name="content"
                             rows={8}
                             className={css.textarea}
                         />
-                        <ErrorMessage name="content" component="span" className={css.error} />
+            
                     </div>
 
                     <div className={css.formGroup}>
                         <label htmlFor="tag">Tag</label>
-                        <Field as="select" name="tag" className={css.select}>
+                        <select id="tag" name="tag" className={css.select}>
                             <option value="Todo">Todo</option>
                             <option value="Work">Work</option>
                             <option value="Personal">Personal</option>
                             <option value="Meeting">Meeting</option>
                             <option value="Shopping">Shopping</option>
-                        </Field>
-                        <ErrorMessage name="tag" component="span" className={css.error} />
+                        </select>
                     </div>
 
                     <div className={css.actions}>
                        <button
                             type="submit"
                             className={css.submitButton}
-    
-                        >
+    >
                             Create note
                         </button>
                         <button
                             type="button"
-                            onClick={() => {
-                                resetForm();
-                                onClose();
-                             }}
+                            onClick={handleCancel}
                             className={css.cancelButton}
                         >Cancel</button>
                     </div>
-                </Form>
-            )}
-        </Formik>
+        </form>
     );
 }
