@@ -3,9 +3,11 @@
 
 // import * as Yup from "yup";
 import css from "./NoteForm.module.css";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createNote, NewNoteData } from "@/lib/api";
-import { useRouter } from "next/router";
+import { useMutation} from "@tanstack/react-query";
+import { createNote } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { useNoteDraftStore } from "@/lib/stores/noteStore";
+import { NewNoteData } from "@/types/note";
 
 
 
@@ -21,16 +23,26 @@ import { useRouter } from "next/router";
 // }
 
 export default function NoteForm () {
-    const queryClient = useQueryClient();
+    // const queryClient = useQueryClient();
     const router = useRouter();
 
-    const handleCancel = () => router.push('/notes/filter/all');
+    const { draft, setDraft, clearDraft } = useNoteDraftStore();
 
+    const handleChange = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+    ) => {
+        setDraft({
+            ...draft,
+            [event.target.name]: event.target.value,
+        });
+    };
+
+    
      const mutation = useMutation({
          mutationFn: createNote,
          onSuccess: () => {
-             queryClient.invalidateQueries({ queryKey: ['notes'] });
-             handleCancel();
+             clearDraft();
+             router.push('/notes/filter/all');
          },
          onError: (error) => {
             console.error('Create note failed:', error);
@@ -40,7 +52,9 @@ export default function NoteForm () {
     const handleSubmit = (formData: FormData) => {
         const values = Object.fromEntries(formData) as NewNoteData;
         mutation.mutate(values);
-    }
+    };
+
+    const handleCancel = () => router.push('/notes/filter/all');
 
 
     return (
@@ -48,24 +62,25 @@ export default function NoteForm () {
         
                     <div className={css.formGroup}>
                         <label htmlFor="title">Title</label>
-                        <input type="text" name="title" className={css.input} />
+                        <input type="text" name="title" className={css.input} defaultValue={draft?.title} onChange={handleChange}/>
         
                     </div>
 
                     <div className={css.formGroup}>
                         <label htmlFor="content">Content</label>
                         <textarea
-            
-                            name="content"
+            name="content"
                             rows={8}
-                            className={css.textarea}
+                    className={css.textarea}
+                    defaultValue={draft?.content}
+                    onChange={handleChange}
                         />
             
                     </div>
 
                     <div className={css.formGroup}>
                         <label htmlFor="tag">Tag</label>
-                        <select id="tag" name="tag" className={css.select}>
+                        <select id="tag" name="tag" className={css.select} defaultValue={draft?.tag} onChange={handleChange}>
                             <option value="Todo">Todo</option>
                             <option value="Work">Work</option>
                             <option value="Personal">Personal</option>
@@ -77,7 +92,7 @@ export default function NoteForm () {
                     <div className={css.actions}>
                        <button
                             type="submit"
-                            className={css.submitButton}
+                    className={css.submitButton}
     >
                             Create note
                         </button>
