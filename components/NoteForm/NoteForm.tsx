@@ -4,8 +4,8 @@ import css from "./NoteForm.module.css";
 import { useMutation} from "@tanstack/react-query";
 import { createNote } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { useNoteDraftStore } from "@/lib/stores/noteStore";
 import { NewNoteData } from "@/types/note";
+import { useNoteDraftStore } from "@/lib/store/noteStore";
 
 
 export default function NoteForm () {
@@ -53,8 +53,7 @@ export default function NoteForm () {
                     defaultValue={draft?.title}
                     onChange={handleChange}
                     required
-                    minLength={3}
-                    maxLength={100} />
+                     />
         
                     </div>
 
@@ -66,7 +65,6 @@ export default function NoteForm () {
                     className={css.textarea}
                     defaultValue={draft?.content}
                     onChange={handleChange}
-                    maxLength={300}
                         />
             
                     </div>
