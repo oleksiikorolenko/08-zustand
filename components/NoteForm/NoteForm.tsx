@@ -1,7 +1,5 @@
 'use client'
 
-
-// import * as Yup from "yup";
 import css from "./NoteForm.module.css";
 import { useMutation} from "@tanstack/react-query";
 import { createNote } from "@/lib/api";
@@ -10,20 +8,7 @@ import { useNoteDraftStore } from "@/lib/stores/noteStore";
 import { NewNoteData } from "@/types/note";
 
 
-
-// const validationSchema = Yup.object({
-//     title: Yup.string().min(3).max(50).required(),
-//     content: Yup.string().max(500),
-//     tag: Yup.mixed().oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping']).required(),
-// });
-
-
-//     interface NoteFormProps {
-//         onClose: () => void;
-// }
-
 export default function NoteForm () {
-    // const queryClient = useQueryClient();
     const router = useRouter();
 
     const { draft, setDraft, clearDraft } = useNoteDraftStore();
@@ -42,7 +27,7 @@ export default function NoteForm () {
          mutationFn: createNote,
          onSuccess: () => {
              clearDraft();
-             router.push('/notes/filter/all');
+             router.push('/notes/filter/All');
          },
          onError: (error) => {
             console.error('Create note failed:', error);
@@ -54,7 +39,7 @@ export default function NoteForm () {
         mutation.mutate(values);
     };
 
-    const handleCancel = () => router.push('/notes/filter/all');
+    const handleCancel = () => router.push('/notes/filter/All');
 
 
     return (
@@ -62,7 +47,14 @@ export default function NoteForm () {
         
                     <div className={css.formGroup}>
                         <label htmlFor="title">Title</label>
-                        <input type="text" name="title" className={css.input} defaultValue={draft?.title} onChange={handleChange}/>
+                <input type="text"
+                    name="title"
+                    className={css.input}
+                    defaultValue={draft?.title}
+                    onChange={handleChange}
+                    required
+                    minLength={3}
+                    maxLength={100} />
         
                     </div>
 
@@ -74,6 +66,7 @@ export default function NoteForm () {
                     className={css.textarea}
                     defaultValue={draft?.content}
                     onChange={handleChange}
+                    maxLength={300}
                         />
             
                     </div>
@@ -104,4 +97,4 @@ export default function NoteForm () {
                     </div>
         </form>
     );
-}
+};

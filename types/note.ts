@@ -11,4 +11,4 @@ export type NewNoteData = {
   title: string;
   content: string;
   tag: string;
-};
+}
