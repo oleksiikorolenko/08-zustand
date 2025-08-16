@@ -2,14 +2,14 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getQueryClient } from "@/lib/tanstack";
 import { fetchNoteById } from "@/lib/api";
 import NoteDetailsClient from "./NoteDetails.client";
-import { title } from "process";
+
 
 
 type PageProps = {
   params: Promise<{id: string}>;
 };
 
-export async function generateMetaData({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
   const note = await fetchNoteById(id);
   return {
